@@ -1,5 +1,5 @@
 import dbConnect from "@/lib/dbConnect";
-import UserModel from "@/model/User";
+import UserModel from "@/models/User";
 import bcrypt from "bcryptjs";
 import { ApiResponse } from "@/types/ApiResponse";
 
@@ -39,6 +39,7 @@ export async function POST(request : Request):Promise<ApiResponse>{
                 email: email,
                 password: hashedPassword,
                 fullName: fullName,
+                userName: email,
                 verifyCode: otp,
                 verifyCodeExpiry: expiry
             });
