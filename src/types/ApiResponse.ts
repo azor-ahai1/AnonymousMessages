@@ -1,10 +1,10 @@
 // import { Message } from "@/model/Message";
 
-export interface ApiResponse{
+export interface ApiResponse<T = any>{
     status: number;
     success: boolean
     message: string;
-    data?: object;
+    data?: T;
     // isAcceptingMessages?: boolean;
     // messages?: Array<Message>;
     // // messages?: Message[]

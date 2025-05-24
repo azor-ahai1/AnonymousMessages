@@ -13,6 +13,9 @@
 # testing
 /coverage
 
+# My Files and Folders
+/assets
+
 # next.js
 /.next/
 /out/

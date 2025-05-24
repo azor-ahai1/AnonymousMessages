@@ -55,5 +55,4 @@ export async function GET(request : Request):Promise<ApiResponse>{
         return {success:false, message:"Error Retriving Messages", status:500} 
     }
 
-
 } 

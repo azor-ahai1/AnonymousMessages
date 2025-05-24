@@ -3,6 +3,7 @@ import MessageSchema from "./Message";
 import { Message } from "./Message";
 
 export interface User extends Document{
+    _id: mongooose.Types.ObjectId;
     fullName: string;
     userName: string;
     email: string;
