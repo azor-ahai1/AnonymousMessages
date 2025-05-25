@@ -4,8 +4,9 @@ import dbConnect from '@/lib/dbConnect';
 import { User } from 'next-auth';
 import { ApiResponse } from '@/types/ApiResponse';
 import { authOptions } from '../auth/[...nextauth]/options';
+import { NextResponse } from 'next/server';
 
-export async function POST(request: Request):Promise<ApiResponse>{
+export async function POST(request: Request){
     await dbConnect();
 
     const {email, newUserName} = await request.json()
@@ -14,11 +15,11 @@ export async function POST(request: Request):Promise<ApiResponse>{
     const user: User = session?.user as User;
     
     if (!session || !user) {
-        return { status:401, success: false, message: 'Not authenticated' }
+        return NextResponse.json({ status:401, success: false, message: 'Not authenticated' })
     }
     
     if (user?.email!==email){
-        return { status:401, success: false, message: 'Not authenticated' }
+        return NextResponse.json({ status:401, success: false, message: 'Not authenticated' })
     }
 
     try {
@@ -28,13 +29,13 @@ export async function POST(request: Request):Promise<ApiResponse>{
         );
 
         if (updateResult.modifiedCount === 0) {
-            return { status:404, message: 'User not found with this email', success: false }
+            return NextResponse.json({ status:404, message: 'User not found with this email', success: false })
         }
         
-        return { status: 200, message: 'Username Successfully Updated', success: true }
+        return NextResponse.json({ status: 200, message: 'Username Successfully Updated', success: true })
         
     } catch (error) {
         console.error('Error updating UserName:', error);
-        return { status: 500, message: 'Error Updating UserName', success: false }
+        return NextResponse.json({ status: 500, message: 'Error Updating UserName', success: false })
     }
 }

@@ -1,4 +1,5 @@
-import ReactDOMServer from 'react-dom/server';
+// import ReactDOMServer from 'react-dom/server';
+import { render } from '@react-email/render';
 import { transporter } from "@/lib/nodemailer";
 import VerificationEmail from "./emails/VerificationEmail";
 import { ApiResponse } from "@/types/ApiResponse";
@@ -22,13 +23,16 @@ export async function sendVerificationEmail({
     verifyCode,
 } : SendVerificationEmailArgs): Promise<ApiResponse>{
     
-    const html = ReactDOMServer.renderToStaticMarkup(
+    // const html = ReactDOMServer.renderToStaticMarkup(
+    //     VerificationEmail({fullname, otp:verifyCode})
+    // );
+    const html = await render(
         VerificationEmail({fullname, otp:verifyCode})
     );
 
     try{
         await transporter.sendMail({
-            from: "aks1092002@gmail.com",
+            from: "swapspace.help@gmail.com",
             to: email,
             subject: "Anonymouse Messages Verification",
             html: html

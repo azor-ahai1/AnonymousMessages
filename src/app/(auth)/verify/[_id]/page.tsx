@@ -8,7 +8,7 @@ import { ApiResponse } from "@/types/ApiResponse";
 import { zodResolver } from "@hookform/resolvers/zod";
 import axios, { AxiosError } from "axios";
 import { useParams } from "next/navigation";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -16,7 +16,8 @@ import * as z  from "zod";
 
 const page = () => {
     const router = useRouter();
-    const param = useParams<{email: string}>();
+    const param = useParams<{_id: string}>();
+    // console.log(param)
 
     const [errorMessage, setErrorMessage] = useState('')
 
@@ -29,8 +30,8 @@ const page = () => {
 
     const onSubmit = async (data: z.infer<typeof verifySchema>) => {
         try {
-            const response = await axios.post<ApiResponse>('/api/sign-up', {
-                email: param,
+            const response = await axios.post<ApiResponse>('/api/verify-code', {
+                userId: param,
                 code: data.code
             })
             toast('OTP verified successfully', {

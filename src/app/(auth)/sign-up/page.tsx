@@ -37,7 +37,11 @@ const page = () => {
             toast('Sign up successful', {
                 description: response.data.message,
             });
-            router.replace(`/verify/${email}`)
+            // console.log("response", response?.data?.data?._id);
+            if(response?.data?.data?._id){
+                router.replace(`/verify/${response?.data?.data?._id}`)
+            }
+            // router.replace(`/verify/${data.email}`)
             // router.replace(`/verify`)
         } catch (error) {
             // if (error instanceof AxiosError) {

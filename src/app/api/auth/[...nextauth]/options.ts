@@ -55,13 +55,21 @@ export const authOptions : NextAuthOptions = {
         })
     ],
     callbacks: {
-        async jwt({token, user}) {
+        async jwt({token, user, trigger, session}) {
             if(user){
                 token._id = user._id?.toString();
                 token.email = user.email;
                 token.isVerified = user.isVerified;
                 token.isAcceptingMessages = user.isAcceptingMessages;
                 token.userName = user.userName;
+            }
+            if (trigger === "update" && session) {
+                if (session.userName !== undefined) {
+                    token.userName = session.userName;
+                }
+                if (session.isAcceptingMessages !== undefined) {
+                    token.isAcceptingMessages = session.isAcceptingMessages;
+                }
             }
             return token;
         },
@@ -84,6 +92,6 @@ export const authOptions : NextAuthOptions = {
     session: {
         strategy: "jwt"
     },
-    secret : process.env.NEXTAUTH_SECRET
+    secret : process.env.NEXT_AUTH_SECRET
 
 }

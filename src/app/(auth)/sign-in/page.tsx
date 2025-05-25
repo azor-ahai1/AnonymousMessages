@@ -10,7 +10,8 @@ import axios, { AxiosError } from "axios";
 import { signIn } from "next-auth/react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { useRouter } from "next/router";
+// import { useRouter } from "next/router";
+import { useRouter } from 'next/navigation';
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -95,3 +96,5 @@ const page = () => {
         </div>
     )
 }
+
+export default page;

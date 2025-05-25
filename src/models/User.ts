@@ -53,15 +53,15 @@ const UserSchema : Schema<User> = new Schema({
         type: Boolean, 
         default: true
     },
-    messages: [
-        MessageSchema
-    ],
-    // message: [
-    //     {
-    //         type: Schema.Types.ObjectId, 
-    //         ref: 'Message'
-    //     }
+    // messages: [
+    //     MessageSchema
     // ],
+    messages: [
+        {
+            type: Schema.Types.ObjectId, 
+            ref: 'Message'
+        }
+    ],
 });
 
 const UserModel = mongooose.models.User as mongooose.Model<User> || mongooose.model<User>("User", UserSchema)

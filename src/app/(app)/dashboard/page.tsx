@@ -4,12 +4,14 @@ import { MessageCard } from "@/components/MessageCard";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Input } from "@/components/ui/input";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Message } from "@/models/Message"
 import { acceptMessageSchema } from "@/schemas/acceptMessageSchema";
 import { uniqueUsernameSchema } from "@/schemas/uniqueUsernameSchema";
 import { ApiResponse } from "@/types/ApiResponse";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useDebounceCallback } from 'usehooks-ts';
+import { User } from "next-auth";
 import axios, { AxiosError } from "axios";
 import { Loader2, RefreshCcw, Edit, X, Check } from "lucide-react";
 import mongoose from "mongoose";
@@ -18,21 +20,32 @@ import { useCallback, useEffect, useState } from "react"
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
+import { useRouter } from "next/navigation";
 
-type SessionUser = {
-    userName?: string;
-  fullName?: string | null;
-  email?: string | null;
+type message = {
+    _id: mongoose.Types.ObjectId;
+    content: string;
+    createdAt: Date,
 };
 
+type MessagesArray = message[];
+
 const page = () => {
-    const [messages, setMessages] = useState<Message []>([]);
+    const [messages, setMessages] = useState<MessagesArray>([]);
     const [isLoading, setIsLoading] = useState(false);
     const [showUsernameForm, setShowUsernameForm] = useState(false);
+    const [username, setUsername] = useState("");
+    const [userNameInfo, setUserNameInfo] = useState('');
+    const [isCheckingUsername, setIsCheckingUsername] = useState(false);
     const [isUpdatingUsername, setIsUpdatingUsername] = useState(false);
+    const [baseUrl, setBaseUrl] = useState('');
+
+    const debouncedUsername = useDebounceCallback(setUsername, 300); 
+
+    const router = useRouter();
     
     const {data : session, update} = useSession(); 
-    const user = session?.user as SessionUser;
+    const user: User = session?.user as User
 
     const form = useForm<z.infer<typeof acceptMessageSchema>>({
         resolver: zodResolver(acceptMessageSchema),
@@ -46,9 +59,14 @@ const page = () => {
     });
 
     const {register, watch, setValue} = form;
-    const { register: registerUsername, handleSubmit: handleUsernameSubmit, formState: { errors: usernameErrors }, reset: resetUsernameForm } = usernameForm;
 
     const acceptMessages = watch('acceptMessages')
+
+    useEffect(() => {
+        if (user?.userName) {
+            usernameForm.reset({ userName: user.userName });
+        }
+    }, [user?.userName, usernameForm]);
 
     const fetchAcceptMessage = useCallback(async() => {
         setIsLoading(true);
@@ -69,7 +87,9 @@ const page = () => {
         setIsLoading(true);
         try {
             const response = await axios.get<ApiResponse>('/api/get-messages');
-            setMessages(response.data?.data?.messages || []);
+            // console.log(response);
+            setMessages(response?.data?.data[0]?.messages?.flat() || []);
+
             if (refresh) {
                 toast('All Messages Fetched', {
                     description: 'Showing latest messages',
@@ -99,10 +119,10 @@ const page = () => {
     // Reset username form when user data changes
     useEffect(() => {
         if (user?.userName) {
-            resetUsernameForm({ userName: user.userName });
+            usernameForm.reset({ userName: user.userName });
         }
-    }, [user?.userName, resetUsernameForm]);
-    
+    }, [user?.userName, usernameForm]);
+
     // Handle switch change
     const handleSwitchChange = async () => {
         try {
@@ -125,6 +145,29 @@ const page = () => {
         setMessages(messages.filter((message) => message._id.toString() !== messageId.toString()))
     }
 
+    useEffect(() => {
+        const checkUsernameUnique = async () => {
+        if (username) {
+            setIsCheckingUsername(true);
+            setUserNameInfo('');
+            try {
+                const response = await axios.get<ApiResponse>(
+                    `/api/check-unique-username?userName=${username}`
+                );
+                setUserNameInfo(response.data.message);
+            } catch (error) {
+                const axiosError = error as AxiosError<ApiResponse>;
+                setUserNameInfo(
+                    axiosError.response?.data.message ?? 'Error checking username'
+                );
+            } finally {
+                setIsCheckingUsername(false);
+            }
+        }
+        };
+        checkUsernameUnique();
+    }, [username]);
+
     const onUsernameSubmit = async (data: z.infer<typeof uniqueUsernameSchema>) => {
         setIsUpdatingUsername(true);
         try {
@@ -136,8 +179,11 @@ const page = () => {
                 description: response.data.message,
             });
             setShowUsernameForm(false);
-            await update();
-            // You might want to refresh the session here or update the user data
+
+            update({userName : data.userName});
+            router.refresh();
+            // console.log(session)
+            
         } catch (error) {
             const axiosError = error as AxiosError<ApiResponse>;
             toast('Error updating Username', {
@@ -150,12 +196,17 @@ const page = () => {
 
     const handleCancelUsernameUpdate = () => {
         setShowUsernameForm(false);
-        resetUsernameForm({ userName: user?.userName || '' });
+        usernameForm.reset({ userName: user?.userName || '' });
     };
+
+    useEffect(() => {
+        if (typeof window !== 'undefined') {
+            setBaseUrl(`${window.location.protocol}//${window.location.host}`);
+        }
+    }, []);
         
-    const baseUrl = `${window.location.protocol}//${window.location.host}`;
-    const profileUrl = `${baseUrl}/message/${user?.userName}`;
-    
+    const profileUrl = baseUrl ? `${baseUrl}/message/${user?.userName}` : '';
+
     const copyToClipboard = () => {
         navigator.clipboard.writeText(profileUrl);
         toast('URL Copied!', {
@@ -200,43 +251,64 @@ const page = () => {
                 {showUsernameForm && (
                     <div className="mt-4 p-4 border rounded-lg bg-gray-50">
                         <h3 className="text-md font-semibold mb-3">Update Username</h3>
-                        <form onSubmit={handleUsernameSubmit(onUsernameSubmit)} className="space-y-4">
-                            <div>
-                                <Input
-                                    {...registerUsername('userName')}
-                                    placeholder="Enter new username"
-                                    className="w-full"
-                                    disabled={isUpdatingUsername}
-                                />
-                                {usernameErrors.userName && (
-                                    <p className="text-red-500 text-sm mt-1">{usernameErrors.userName.message}</p>
-                                )}
-                            </div>
-                            <div className="flex gap-2">
-                                <Button 
-                                    type="submit" 
-                                    size="sm"
-                                    disabled={isUpdatingUsername}
-                                >
-                                    {isUpdatingUsername ? (
-                                        <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                                    ) : (
-                                        <Check className="h-4 w-4 mr-2" />
+                        <Form {...usernameForm}>
+                            <form onSubmit={usernameForm.handleSubmit(onUsernameSubmit)} className="space-y-4">
+                                <FormField
+                                    control={usernameForm.control}
+                                    name="userName"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Username</FormLabel>
+                                            <FormControl>
+                                                <Input
+                                                    placeholder="Enter new username"
+                                                    {...field}
+                                                    onChange={(e) => {
+                                                        field.onChange(e);
+                                                        debouncedUsername(e.target.value);
+                                                    }}
+                                                    disabled={isUpdatingUsername}
+                                                />
+                                            </FormControl>
+                                            {isCheckingUsername && (
+                                                <div className="flex items-center">
+                                                    <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                                                    <span className="text-sm text-gray-500">Checking username...</span>
+                                                </div>
+                                            )}
+                                            <p className={`text-sm ${userNameInfo === "Unique Username" ? 'text-green-500' : 'text-red-500'}`}>
+                                                {userNameInfo}
+                                            </p>
+                                            <FormMessage />
+                                        </FormItem>
                                     )}
-                                    Update
-                                </Button>
-                                <Button 
-                                    type="button" 
-                                    variant="outline" 
-                                    size="sm"
-                                    onClick={handleCancelUsernameUpdate}
-                                    disabled={isUpdatingUsername}
-                                >
-                                    <X className="h-4 w-4 mr-2" />
-                                    Cancel
-                                </Button>
-                            </div>
-                        </form>
+                                />
+                                <div className="flex gap-2">
+                                    <Button 
+                                        type="submit" 
+                                        size="sm"
+                                        disabled={isUpdatingUsername}
+                                    >
+                                        {isUpdatingUsername ? (
+                                            <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                                        ) : (
+                                            <Check className="h-4 w-4 mr-2" />
+                                        )}
+                                        Update
+                                    </Button>
+                                    <Button 
+                                        type="button" 
+                                        variant="outline" 
+                                        size="sm"
+                                        onClick={handleCancelUsernameUpdate}
+                                        disabled={isUpdatingUsername}
+                                    >
+                                        <X className="h-4 w-4 mr-2" />
+                                        Cancel
+                                    </Button>
+                                </div>
+                            </form>
+                        </Form>
                     </div>
                 )}
             </div>
@@ -261,9 +333,10 @@ const page = () => {
 
             <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-6">
                 {messages.length > 0 ? (
-                    messages.map((message, index) => (
-                        <MessageCard key={message._id.toString()} message={message} onMessageDelete={handleDeleteMessage} />
-                    ))
+                    messages.map((message, index) => {
+                        return(
+                        <MessageCard key={index} messageId={message?._id}  time={message?.createdAt} message={message?.content} onMessageDelete={handleDeleteMessage} />
+                    )})
                 ) : (
                     <p>No messages to display.</p>
                 )}

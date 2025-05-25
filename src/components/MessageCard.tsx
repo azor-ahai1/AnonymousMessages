@@ -4,7 +4,6 @@ import React, { useState } from 'react';
 import axios, { AxiosError } from 'axios';
 import dayjs from 'dayjs';
 import { X } from 'lucide-react';
-import {Message} from '@/models/Message';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   AlertDialog,
@@ -24,21 +23,23 @@ import { toast } from 'sonner';
 import mongoose from 'mongoose';
 
 type MessageCardProps = {
-  message: Message;
+  message: string;
+  messageId: mongoose.Types.ObjectId,
+  time: Date,
   onMessageDelete: (messageId: mongoose.Types.ObjectId) => void;
 };
 
-export function MessageCard({ message, onMessageDelete }: MessageCardProps) {
+export function MessageCard({ message, messageId, time, onMessageDelete }: MessageCardProps) {
 
   const handleDeleteConfirm = async () => {
     try {
       const response = await axios.delete<ApiResponse>(
-        `/api/delete-message/${message._id}`
+        `/api/delete-message/${messageId}`
       );
       toast('Message Deleted Successfully', {
         description: response.data.message,
       });
-      onMessageDelete(message._id);
+      onMessageDelete(messageId);
 
     } catch (error) {
       const axiosError = error as AxiosError<ApiResponse>;
@@ -52,7 +53,7 @@ export function MessageCard({ message, onMessageDelete }: MessageCardProps) {
     <Card className="card-bordered">
       <CardHeader>
         <div className="flex justify-between items-center">
-          <CardTitle>{message.content}</CardTitle>
+          <CardTitle>{message}</CardTitle>
           <AlertDialog>
             <AlertDialogTrigger asChild>
               <Button variant='destructive'>
@@ -79,7 +80,7 @@ export function MessageCard({ message, onMessageDelete }: MessageCardProps) {
           </AlertDialog>
         </div>
         <div className="text-sm">
-          {dayjs(message.createdAt).format('MMM D, YYYY h:mm A')}
+          {dayjs(time).format('MMM D, YYYY h:mm A')}
         </div>
       </CardHeader>
       <CardContent></CardContent>
