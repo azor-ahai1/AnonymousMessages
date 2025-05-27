@@ -1,5 +1,5 @@
 import mongooose, {Schema, Document} from "mongoose"
-import MessageSchema from "./Message";
+// import MessageSchema from "./Message";
 import { Message } from "./Message";
 
 export interface User extends Document{

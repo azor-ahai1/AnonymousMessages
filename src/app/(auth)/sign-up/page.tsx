@@ -15,7 +15,7 @@ import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import {Loader2} from "lucide-react" 
 
-const page = () => {
+const Page = () => {
     const [errorMessage, setErrorMessage] = useState('')
     const [isLoading, setIsLoading] = useState(false)
     const [email, setEmail] = useState('')
@@ -33,7 +33,7 @@ const page = () => {
     const onSubmit = async (data: z.infer<typeof signUpSchema>) => {
         setIsLoading(true);
         try {
-            const response = await axios.post<ApiResponse>('/api/sign-up', data)
+            const response = await axios.post('/api/sign-up', data)
             toast('Sign up successful', {
                 description: response.data.message,
             });
@@ -132,4 +132,4 @@ const page = () => {
     )
 }
 
-export default page;
+export default Page;

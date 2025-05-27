@@ -2,7 +2,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "../auth/[...nextauth]/options";
 import dbConnect from "@/lib/dbConnect";
 import UserModel, { User } from "@/models/User";
-import { ApiResponse } from "@/types/ApiResponse";
+// import { ApiResponse } from "@/types/ApiResponse";
 import { NextResponse } from "next/server";
 
 
@@ -39,12 +39,13 @@ export async function POST(request: Request){
 
         
     }catch(error){
+        console.log(error)
         return NextResponse.json({status:500, success:false, message:'Error updating User message acceptance status.'})
     }
 } 
 
 
-export async function GET(request: Request){
+export async function GET(){
     await dbConnect();
     
     const session = await getServerSession(authOptions);
@@ -71,6 +72,7 @@ export async function GET(request: Request){
         return NextResponse.json({status:200, success:true, message:'User data founded', data: user})
         
     }catch(error){
+        console.log(error)
         return NextResponse.json({status:500, success:false, message:'Error getting User message acceptance status.'})
     }
 } 

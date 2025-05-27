@@ -1,7 +1,7 @@
 import dbConnect from "@/lib/dbConnect";
 import UserModel from "@/models/User";
 import bcrypt from "bcryptjs";
-import { ApiResponse } from "@/types/ApiResponse";
+// import { ApiResponse } from "@/types/ApiResponse";
 
 import { sendVerificationEmail } from "@/helpers/sendVerificationEmail";
 import { NextResponse } from "next/server";

@@ -4,12 +4,12 @@ import { Button } from "@/components/ui/button";
 import { Form, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { signInSchema } from "@/schemas/signInSchema";
-import { ApiResponse } from "@/types/ApiResponse";
+// import { ApiResponse } from "@/types/ApiResponse";
 import { zodResolver } from "@hookform/resolvers/zod";
-import axios, { AxiosError } from "axios";
+// import axios, { AxiosError } from "axios";
 import { signIn } from "next-auth/react";
 import Link from "next/link";
-import { useParams } from "next/navigation";
+// import { useParams } from "next/navigation";
 // import { useRouter } from "next/router";
 import { useRouter } from 'next/navigation';
 import React, { useState } from "react";
@@ -17,8 +17,8 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import * as z  from "zod";
 
-const page = () => {
-    const [isLoading, setIsLoading] = useState(false)
+const Page = () => {
+    // const [isLoading, setIsLoading] = useState(false)
     const router = useRouter(); 
     const form = useForm<z.infer<typeof signInSchema>>({
         resolver: zodResolver(signInSchema),
@@ -97,4 +97,4 @@ const page = () => {
     )
 }
 
-export default page;
+export default Page;

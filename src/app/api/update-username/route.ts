@@ -2,7 +2,7 @@ import UserModel from '@/models/User';
 import { getServerSession } from 'next-auth/next';
 import dbConnect from '@/lib/dbConnect';
 import { User } from 'next-auth';
-import { ApiResponse } from '@/types/ApiResponse';
+// import { ApiResponse } from '@/types/ApiResponse';
 import { authOptions } from '../auth/[...nextauth]/options';
 import { NextResponse } from 'next/server';
 

@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Input } from "@/components/ui/input";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { Message } from "@/models/Message"
 import { acceptMessageSchema } from "@/schemas/acceptMessageSchema";
 import { uniqueUsernameSchema } from "@/schemas/uniqueUsernameSchema";
 import { ApiResponse } from "@/types/ApiResponse";
@@ -30,7 +29,7 @@ type message = {
 
 type MessagesArray = message[];
 
-const page = () => {
+const Page = () => {
     const [messages, setMessages] = useState<MessagesArray>([]);
     const [isLoading, setIsLoading] = useState(false);
     const [showUsernameForm, setShowUsernameForm] = useState(false);
@@ -71,7 +70,7 @@ const page = () => {
     const fetchAcceptMessage = useCallback(async() => {
         setIsLoading(true);
         try {
-            const response = await axios.get<ApiResponse>('/api/accept-messages');
+            const response = await axios.get('/api/accept-messages');
             setValue('acceptMessages', response.data?.data?.isAcceptingMessage);
         } catch (error) {
             const axiosError = error as AxiosError<ApiResponse>;
@@ -86,7 +85,7 @@ const page = () => {
     const fetchMessages = useCallback( async (refresh: boolean = false) => {
         setIsLoading(true);
         try {
-            const response = await axios.get<ApiResponse>('/api/get-messages');
+            const response = await axios.get('/api/get-messages');
             // console.log(response);
             setMessages(response?.data?.data[0]?.messages?.flat() || []);
 
@@ -126,7 +125,7 @@ const page = () => {
     // Handle switch change
     const handleSwitchChange = async () => {
         try {
-        const response = await axios.post<ApiResponse>('/api/accept-messages', {
+        const response = await axios.post('/api/accept-messages', {
             acceptMessages: !acceptMessages,
         });
         setValue('acceptMessages', !acceptMessages);
@@ -345,4 +344,4 @@ const page = () => {
     );
 }
 
-export default page;
+export default Page;
