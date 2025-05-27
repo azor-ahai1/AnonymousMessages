@@ -35,7 +35,7 @@ export default function Home() {
           }}
         >
           <h1 className="text-3xl md:text-5xl font-bold text-gray-100">
-            Dive into the World of Anonymous Feedback
+            Dive into the World of Anonymous Messages
           </h1>
           <p className="mt-3 md:mt-4 text-base md:text-lg text-gray-100">
             Secret Ping - Where your identity remains a secret.

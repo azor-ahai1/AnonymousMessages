@@ -1,8 +1,8 @@
 import dbConnect from "@/lib/dbConnect";
-import { ApiResponse } from "@/types/ApiResponse";
-import { getServerSession } from "next-auth";
-import { authOptions } from "../auth/[...nextauth]/options";
-import mongoose from "mongoose";
+// import { ApiResponse } from "@/types/ApiResponse";
+// import { getServerSession } from "next-auth";
+// import { authOptions } from "../auth/[...nextauth]/options";
+// import mongoose from "mongoose";
 import UserModel from "@/models/User";
 import MessageModel from "@/models/Message";
 import { NextResponse } from "next/server";

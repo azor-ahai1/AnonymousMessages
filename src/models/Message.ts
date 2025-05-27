@@ -1,5 +1,5 @@
 import mongoose, {Schema, Document} from "mongoose"
-import {User} from "./User"
+// import {User} from "./User"
 
 export interface Message extends Document{
     _id: mongoose.Types.ObjectId;

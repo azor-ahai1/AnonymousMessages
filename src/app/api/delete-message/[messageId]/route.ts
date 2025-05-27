@@ -4,7 +4,7 @@ import dbConnect from '@/lib/dbConnect';
 import { User } from 'next-auth';
 import MessageModel from '@/models/Message';
 import { NextResponse } from 'next/server';
-import { ApiResponse } from '@/types/ApiResponse';
+// import { ApiResponse } from '@/types/ApiResponse';
 import { authOptions } from '../../auth/[...nextauth]/options';
 
 export async function DELETE(
