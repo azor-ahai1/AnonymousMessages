@@ -25,7 +25,7 @@ export async function POST(request: Request){
             );
 
             if (update.modifiedCount === 0) {
-                return { status:402, message: 'Account could not verify. Please Try Again.', success: false }
+                return NextResponse.json({ status:402, message: 'Account could not verify. Please Try Again.', success: false })
             }
 
             return NextResponse.json({success:true, message:"Account Verified Successfully", status:200}) 
