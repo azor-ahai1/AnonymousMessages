@@ -3,7 +3,9 @@ import CredentialsProvider  from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 import dbConnect from "@/lib/dbConnect";
 // import { User } from "@/models/User";
+// import { User } from "@/models/User";
 import UserModel from "@/models/User";
+import { unknown } from "zod";
 
 export const authOptions : NextAuthOptions = {
     providers : [
@@ -22,11 +24,8 @@ export const authOptions : NextAuthOptions = {
                     placeholder: "********"
                 },
             },
-            async authorize(credentials){
-                if (!credentials?.identifier || !credentials?.password) {
-                    return null;
-                }
-                await dbConnect();
+            async authorize(credentials : any) : Promise<any> {
+                const db = await dbConnect();
                 try{
                     const user = await UserModel.findOne({ 
                         $or: [
@@ -54,8 +53,8 @@ export const authOptions : NextAuthOptions = {
                         userName: user.userName,
                     };
                 }
-                catch (error: any){
-                    throw new Error(error)
+                catch (error : unknown){
+                    throw new Error((error as Error).message)
                 }
             }
         })

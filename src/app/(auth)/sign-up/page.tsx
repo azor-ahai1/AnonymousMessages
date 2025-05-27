@@ -39,6 +39,7 @@ const Page = () => {
             });
             console.log(email);
             // console.log("response", response?.data?.data?._id);
+            console.log(email);
             if(response?.data?.data?._id){
                 router.replace(`/verify/${response?.data?.data?._id}`)
             }
