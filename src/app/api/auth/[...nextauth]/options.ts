@@ -4,6 +4,7 @@ import bcrypt from "bcryptjs";
 import dbConnect from "@/lib/dbConnect";
 // import { User } from "@/models/User";
 import UserModel from "@/models/User";
+import { unknown } from "zod";
 
 export const authOptions : NextAuthOptions = {
     providers : [
@@ -11,15 +12,10 @@ export const authOptions : NextAuthOptions = {
             id: "credentials",
             name: "Credentials",
             credentials: {
-                email : {
-                    label: "Email",
-                    type: "email",
-                    placeholder: "you@example.com"
-                },
-                userName : {
-                    label: "UserName",
-                    type: "userName",
-                    placeholder: "username"
+                identifier: {
+                    label: "Email or Username",
+                    type: "text",
+                    placeholder: "you@example.com or username"
                 },
                 password : {
                     label: "Password",
@@ -27,8 +23,11 @@ export const authOptions : NextAuthOptions = {
                     placeholder: "********"
                 },
             },
-            async authorize(credentials : any) : Promise<any> {
-                // const db = await dbConnect();
+            async authorize(credentials) {
+                await dbConnect();
+                if(!credentials?.identifier || !credentials?.password){
+                    return null;
+                }
                 try{
                     const user = await UserModel.findOne({ 
                         $or: [
@@ -46,10 +45,18 @@ export const authOptions : NextAuthOptions = {
                     if (!isValidPassword) {
                         throw new Error("Invalid password");
                     }
-                    return user;
+                    return {
+                        id: user._id.toString(),
+                        email: user.email,
+                        name: user.userName,
+                        _id: user._id.toString(),
+                        isVerified: user.isVerified,
+                        isAcceptingMessages: user.isAcceptingMessage,
+                        userName: user.userName,
+                    };
                 }
-                catch (error: any){
-                    throw new Error(error)
+                catch (error : unknown){
+                    throw new Error((error as Error).message)
                 }
             }
         })

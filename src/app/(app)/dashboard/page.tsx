@@ -80,7 +80,7 @@ const Page = () => {
         } finally {
             setIsLoading(false);
         }
-    }, [])
+    }, [setValue])
 
     const fetchMessages = useCallback( async (refresh: boolean = false) => {
         setIsLoading(true);
@@ -103,7 +103,7 @@ const Page = () => {
             setIsLoading(false);
         }
         },
-        [setIsLoading, setMessages, toast]
+        [setIsLoading, setMessages]
     );
 
     // Fetch initial state from the server
