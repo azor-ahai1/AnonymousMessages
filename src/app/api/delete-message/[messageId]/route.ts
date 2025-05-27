@@ -3,12 +3,12 @@ import { getServerSession } from 'next-auth/next';
 import dbConnect from '@/lib/dbConnect';
 import { User } from 'next-auth';
 import MessageModel from '@/models/Message';
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 // import { ApiResponse } from '@/types/ApiResponse';
 import { authOptions } from '../../auth/[...nextauth]/options';
 
 export async function DELETE(
-  request: Request,
+  request: NextRequest,
   { params }: { params: { messageId: string } }
 ){
     await dbConnect();
