@@ -1,4 +1,4 @@
-"use client"
+'use client';
 
 import React from 'react';
 import axios, { AxiosError } from 'axios';
@@ -24,13 +24,17 @@ import mongoose from 'mongoose';
 
 type MessageCardProps = {
   message: string;
-  messageId: mongoose.Types.ObjectId,
-  time: Date,
+  messageId: mongoose.Types.ObjectId;
+  time: Date;
   onMessageDelete: (messageId: mongoose.Types.ObjectId) => void;
 };
 
-export function MessageCard({ message, messageId, time, onMessageDelete }: MessageCardProps) {
-
+export function MessageCard({
+  message,
+  messageId,
+  time,
+  onMessageDelete,
+}: MessageCardProps) {
   const handleDeleteConfirm = async () => {
     try {
       const response = await axios.delete<ApiResponse>(
@@ -40,50 +44,57 @@ export function MessageCard({ message, messageId, time, onMessageDelete }: Messa
         description: response.data.message,
       });
       onMessageDelete(messageId);
-
     } catch (error) {
       const axiosError = error as AxiosError<ApiResponse>;
-      toast("Error deleting message", {
-        description: axiosError.response?.data.message ?? 'Failed to delete message',
+      toast('Error deleting message', {
+        description:
+          axiosError.response?.data.message ?? 'Failed to delete message',
       });
-    } 
+    }
   };
 
   return (
-    <Card className="card-bordered">
+    <Card className="border border-gray-700 bg-gray-900 text-gray-100 hover:shadow-lg transition-shadow duration-200">
       <CardHeader>
-        <div className="flex justify-between items-center">
-          <CardTitle>{message}</CardTitle>
+        <div className="flex justify-between items-start gap-4">
+          <div className="flex-1">
+            <CardTitle className="text-base font-medium leading-snug">
+              {message}
+            </CardTitle>
+            <p className="mt-2 text-xs text-gray-400">
+              {dayjs(time).format('MMM D, YYYY h:mm A')}
+            </p>
+          </div>
           <AlertDialog>
             <AlertDialogTrigger asChild>
-              <Button variant='destructive'>
+              <Button
+                variant="ghost"
+                size="icon"
+                aria-label="Delete message"
+                className="text-red-500 hover:text-red-700"
+              >
                 <X className="w-5 h-5" />
               </Button>
             </AlertDialogTrigger>
             <AlertDialogContent>
               <AlertDialogHeader>
-                <AlertDialogTitle>Are you sure to delete this message?</AlertDialogTitle>
+                <AlertDialogTitle>Delete this message?</AlertDialogTitle>
                 <AlertDialogDescription>
-                  This action cannot be undone. This will permanently delete
-                  this message.
+                  This action cannot be undone and will permanently remove the
+                  message.
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
-                <AlertDialogCancel>
-                  Cancel
-                </AlertDialogCancel>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
                 <AlertDialogAction onClick={handleDeleteConfirm}>
-                  Continue
+                  Delete
                 </AlertDialogAction>
               </AlertDialogFooter>
             </AlertDialogContent>
           </AlertDialog>
         </div>
-        <div className="text-sm">
-          {dayjs(time).format('MMM D, YYYY h:mm A')}
-        </div>
       </CardHeader>
-      <CardContent></CardContent>
+      <CardContent />
     </Card>
   );
 }
