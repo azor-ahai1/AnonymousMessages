@@ -1,15 +1,14 @@
 import mongoose, {Schema, Document} from "mongoose"
-// import {User} from "./User"
 
-export interface Message extends Document{
+export interface Reply extends Document{
     _id: mongoose.Types.ObjectId;
     content: string;
     createdAt: Date;
     user: Schema.Types.ObjectId;
-    reply: Schema.Types.ObjectId;
+    message: Schema.Types.ObjectId;
 }
 
-const MessageSchema : Schema<Message> = new Schema({
+const ReplySchema : Schema<Reply> = new Schema({
     content: {
         type: String, 
         required: true
@@ -24,12 +23,13 @@ const MessageSchema : Schema<Message> = new Schema({
         ref: 'User',
         required: true
     },
-    reply: {
+    message: {
         type: Schema.Types.ObjectId,
-        ref: 'Reply'
+        ref: 'Message',
+        required: true
     }
 })
 
-const MessageModel = mongoose.models.Message as mongoose.Model<Message> || mongoose.model<Message>("Message", MessageSchema)
+const ReplyModel = mongoose.models.Reply as mongoose.Model<Reply> || mongoose.model<Reply>("Reply", ReplySchema)
 
-export default MessageModel;
+export default ReplyModel;

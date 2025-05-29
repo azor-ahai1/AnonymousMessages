@@ -3,12 +3,12 @@ import { getServerSession } from 'next-auth/next';
 import dbConnect from '@/lib/dbConnect';
 import { User } from 'next-auth';
 import MessageModel from '@/models/Message';
-import { NextRequest, NextResponse } from 'next/server';
-// import { ApiResponse } from '@/types/ApiResponse';
+import { NextResponse } from 'next/server';
 import { authOptions } from '../../auth/[...nextauth]/options';
+import ReplyModel from '@/models/Reply';
 
 export async function DELETE(
-  request: NextRequest,
+    request: Request,
   { params }: { params: Promise<{ messageId: string }> }
 ){
     await dbConnect();
@@ -30,6 +30,19 @@ export async function DELETE(
 
         if (updateResult.modifiedCount === 0) {
             return NextResponse.json({ status:404, message: 'Message not found or already deleted', success: false })
+        }
+
+        const message =  await MessageModel.findById(messageId);
+
+        if(message?.reply){
+            const reply = await ReplyModel.findByIdAndDelete(message.reply);
+            if(!reply){
+                return NextResponse.json({ status:404, message: 'Reply not found in the database', success: false})
+            }
+            await MessageModel.updateOne(
+                { _id: messageId },
+                {reply: null }
+            );
         }
 
         const deletedMessage = await MessageModel.findByIdAndDelete(messageId);

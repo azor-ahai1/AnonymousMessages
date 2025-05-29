@@ -13,7 +13,7 @@ import { useDebounceCallback } from 'usehooks-ts';
 import { User } from "next-auth";
 import axios, { AxiosError } from "axios";
 import { Loader2, RefreshCcw, Edit, X, Check } from "lucide-react";
-import mongoose from "mongoose";
+import mongoose, { Schema } from "mongoose";
 import { useSession } from "next-auth/react";
 import { useCallback, useEffect, useState } from "react"
 import { useForm } from "react-hook-form";
@@ -26,6 +26,7 @@ type message = {
     _id: mongoose.Types.ObjectId;
     content: string;
     createdAt: Date,
+    reply?: Schema.Types.ObjectId | null;
 };
 
 type MessagesArray = message[];
@@ -87,7 +88,7 @@ const Page = () => {
         setIsLoading(true);
         try {
             const response = await axios.get('/api/get-messages');
-            // console.log(response);
+            console.log(response);
             setMessages(response?.data?.data[0]?.messages?.flat() || []);
 
             if (refresh) {
@@ -218,7 +219,7 @@ const Page = () => {
         return (
             <div className="flex flex-col items-center justify-center h-screen text-center px-6 bg-gray-900 text-white">
                 <div className="bg-gray-800 p-8 rounded-xl shadow-lg max-w-md w-full">
-                    <h2 className="text-2xl font-bold mb-4">You're not logged in</h2>
+                    <h2 className="text-2xl font-bold mb-4">You are not logged in</h2>
                     <p className="text-gray-300 mb-6">
                         Please log in to access this feature and explore Secret Ping.
                     </p>
@@ -236,13 +237,18 @@ const Page = () => {
     return (
         <div className="p-12 bg-gray-800 shadow-md w-full text-gray-50">
         {/* Heading */}
-            <h1 className="text-3xl md:text-4xl font-bold mb-8">Your Dashboard</h1>
+            <div className="flex flex-row">
+                <h1 className="text-3xl md:text-4xl font-bold mb-8 w-11/12">Your Dashboard</h1>
+                <Link href={`/replies/${user?.userName}`}>
+                    <Button className="items-baseline cursor-grab"> See Replies </Button>
+                </Link>
+            </div>
 
             {/* Shareable Link Section */}
             <div className="mb-10 border-b border-gray-700 pb-6">
                 <h2 className="text-lg font-semibold text-gray-200 mb-3">Your Unique Profile Link</h2>
                 <div className="flex flex-col md:flex-row items-stretch md:items-center gap-2">
-                    <input type="text" value={profileUrl} disabled className="w-full px-4 py-2 border border-gray-600 rounded-md bg-gray-900 text-sm text-gray-300 cursor-not-allowed" />
+                    <input type="text" value={profileUrl} disabled className="w-full px-4 py-2 border border-gray-600 rounded-md bg-gray-900 text-sm text-gray-300 cursor-text" />
                     <Button onClick={copyToClipboard} className="shrink-0 w-full md:w-auto transition duration-200 hover:bg-gray-700" >
                         Copy Link
                     </Button>
@@ -360,6 +366,7 @@ const Page = () => {
                         messageId={message?._id}
                         time={message?.createdAt}
                         message={message?.content}
+                        isReplied={message?.reply ? true : false}
                         onMessageDelete={handleDeleteMessage}
                         />
                     ))
