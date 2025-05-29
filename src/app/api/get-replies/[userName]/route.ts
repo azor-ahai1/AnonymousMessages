@@ -12,7 +12,7 @@ export async function GET(
 ){
     await dbConnect();
     const {userName} = await params;
-    console.log(userName);
+    // console.log(userName);
     const user = await UserModel.findOne({userName : userName});
     
     if(!user){

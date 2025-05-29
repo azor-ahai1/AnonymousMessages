@@ -53,9 +53,9 @@ export default function RepliesPage() {
     
     setIsLoading(true);
     try {
-      console.log(userName)
+    //   console.log(userName)
       const response = await axios.get(`/api/get-replies/${userName}`);
-      console.log(response)
+    //   console.log(response)
       if (response.data.success) {
         setMessages(response.data.data);
       }
