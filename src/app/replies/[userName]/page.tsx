@@ -48,10 +48,6 @@ export default function RepliesPage() {
 
   const canDeleteReplies = session?.user?.userName === userName;
 
-  useEffect(() => {
-    fetchReplies();
-  }, [userName]);
-
   const fetchReplies = async () => {
     if (!userName) return;
     
@@ -74,6 +70,10 @@ export default function RepliesPage() {
       setIsLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchReplies();
+  }, [userName]);
 
   const handleDeleteReply = async (replyId: mongoose.Types.ObjectId) => {
     setDeletingReplyId(replyId.toString());
@@ -134,7 +134,7 @@ export default function RepliesPage() {
                 <MessageCircle className="h-10 w-10 text-gray-400 mx-auto mb-4" />
                 <h2 className="text-xl font-semibold text-gray-200 mb-1">No Replies Yet</h2>
                 <p className="text-gray-400 text-sm">
-                    @{userName} hasn't replied to any messages yet.
+                    @{userName} has not replied to any messages yet.
                 </p>
             </div>
         ) : (
