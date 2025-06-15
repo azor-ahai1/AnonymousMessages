@@ -16,8 +16,10 @@ export async function POST(request : Request){
     try{
         const {email, password, fullName} = await request.json();
 
+        const lowerCaseEmail = email.toLowerCase();
+
         const existingUserVerified = await UserModel.findOne({
-            email: email,
+            email: lowerCaseEmail,
             isVerified: true
         })
         if(existingUserVerified){
@@ -27,7 +29,7 @@ export async function POST(request : Request){
         const otp = generateOTP().toString();
         const hashedPassword = await bcrypt.hash(password, 10);
         const expiry = new Date(Date.now() + 600000);
-        const existingUser = await UserModel.findOne({ email: email });
+        const existingUser = await UserModel.findOne({ email: lowerCaseEmail });
 
         if(existingUser){
             existingUser.password = hashedPassword;
@@ -37,7 +39,7 @@ export async function POST(request : Request){
             await existingUser.save();
         }else{
             const user = new UserModel({
-                email: email,
+                email: lowerCaseEmail,
                 password: hashedPassword,
                 fullName: fullName,
                 userName: email,
@@ -47,12 +49,12 @@ export async function POST(request : Request){
             await user.save();
         }
 
-        const user = await UserModel.findOne({email}).select(
+        const user = await UserModel.findOne({lowerCaseEmail}).select(
             "-passowrd -verifyCode -verifyCodeExpiry"
         )
 
         const emailResponse = await sendVerificationEmail({
-            email,
+            email: lowerCaseEmail,
             fullname: fullName,
             verifyCode: otp
         })

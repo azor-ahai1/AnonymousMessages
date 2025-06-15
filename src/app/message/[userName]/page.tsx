@@ -25,7 +25,7 @@ import { toast } from 'sonner';
 
 export default function SendMessage() {
   const params = useParams<{ userName: string }>();
-  const userName = params.userName;
+  const userName = decodeURIComponent(params.userName);
 
   const [baseUrl, setBaseUrl] = useState('')
 

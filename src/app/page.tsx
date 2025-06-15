@@ -44,7 +44,7 @@ export default function Home() {
 
         {/* Message Carousel */}
         <Carousel
-          plugins={[Autoplay({ delay: 1400 })]}
+          plugins={[Autoplay({ delay: 3000 })]}
           className="w-full max-w-md md:max-w-lg rounded-xl overflow-hidden backdrop-blur-md shadow-2xl"
         >
           <CarouselContent>
